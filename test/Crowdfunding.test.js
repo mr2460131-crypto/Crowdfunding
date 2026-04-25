@@ -46,7 +46,16 @@ describe("CrowdFundding ",function(){
          await expect(crowdfundding.connect(backer1).contribute(0, {value: ethers.parseEther("0")})).to.be.revertedWith("Must send ETH");   
     
      });
+   it("07.campaign creator can withdraw found",async function(){
+      await crowdfundding.connect(creator).createCampaign("test campaign","test description",ethers.parseEther("10"),30);
+      await crowdfundding.connect(backer1).contribute(0,{value: ethers.parseEther("10")});
+      await time .increase(31*24*60*60);
+      await  crowdfundding.connect(creator).claimFunds(0);
+      const campaign = await crowdfundding.getCampaign(0);
+      expect (campaign.claimed).to.equal(true);
+      });
     
+
 
 
 
