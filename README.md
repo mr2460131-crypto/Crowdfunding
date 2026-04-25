@@ -1,13 +1,33 @@
-# Sample Hardhat Project
+# Crowdfunding Smart Contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+A decentralized crowdfunding platform built with Solidity and Hardhat.
 
-Try running some of the following tasks:
+## Project Description
+This smart contract allows project creators to launch funding campaigns, 
+backers can contribute ETH, and funds are released only when the goal is 
+met within the deadline.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
+## Installation
+```bash
+npm install
 ```
+
+## Compile
+```bash
+npx hardhat compile
+```
+
+## Run Tests
+```bash
+npx hardhat test
+```
+
+## Deploy to Sepolia
+```bash
+npx hardhat run scripts/deploy.js --network sepolia
+```
+
+## Deployed Contract
+- **Network:** Sepolia Testnet
+- **Contract Address:** 0x2313a8FCB4AE29665e8dc8B4B4DC65DC0B871685
+- **Etherscan:** https://sepolia.etherscan.io/address/0x2313a8FCB4AE29665e8dc8B4B4DC65DC0B871685#code
