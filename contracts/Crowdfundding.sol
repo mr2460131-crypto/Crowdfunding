@@ -49,4 +49,39 @@ pragma solidity ^0.8.20;
      emit CampaignCreated(campaignCount - 1, msg.sender, goalAmount, deadline);
        }
 
+            
+
+     function contribute(uint campaignID) public payable{
+          require(block.timestamp<campaigns[campaignID].deadline,"Time Over");
+          require(msg.value >0,"Must send ETH");
+campaigns[campaignID].amountRaised += msg.value;
+campaigns[campaignID].contributors[msg.sender] += msg.value;
+emit ContributionReceived(campaignID, msg.sender, msg.value);
+
+     }  
+function claimFunds( uint256 campaignID) public onlyCreator(campaignID){
+          require(block.timestamp> campaigns[campaignID].deadline,"Wait till to the deadline");
+          require(campaigns[campaignID].amountRaised >= campaigns[campaignID].goalAmount,"Goal not achived");
+          require(campaigns[campaignID].claimed==false,"already taken");
+         campaigns[campaignID].claimed =true;
+      
+        (bool success, ) = payable(campaigns[campaignID].creator).call{value: campaigns[campaignID].amountRaised}("");
+        require(success,"Transfer Failed");
+        emit FundsClaimed(campaignID, msg.sender, campaigns[campaignID].amountRaised);
+       }
+      function refund(uint256 campaignID) public{
+         require(block.timestamp>campaigns[campaignID].deadline,"campaign is still active");
+         require(campaigns[campaignID].amountRaised <campaigns[campaignID].goalAmount," you need for till deadline");
+         uint256 amount = campaigns[campaignID].contributors[msg.sender];
+          require(amount >0,"No contribuation");
+
+          campaigns[campaignID].contributors[msg.sender] = 0;
+      
+         (bool success,  ) = payable(msg.sender).call{value:amount}("");
+      require(success,"transfer failed");
+          emit RefundIssued(campaignID, msg.sender, amount);
+
+
+      }
+
   }
