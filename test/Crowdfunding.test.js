@@ -39,9 +39,13 @@ describe("CrowdFundding ",function(){
    it("05 Contribution fails after deadline",async function(){
        await crowdfundding.connect(creator).createCampaign("test campaign ","test description",ethers.parseEther("10"),30);
        await time.increase(31 * 24 * 60 * 60);
-      await expect(crowdfundding.connect(backer1).contribute(0, {value: ethers.parseEther("1")})).to.be.revertedWith("Time Over");
+       await expect(crowdfundding.connect(backer1).contribute(0, {value: ethers.parseEther("1")})).to.be.revertedWith("Time Over");
      });
-
+   it("06.Contribution will be faill if contribution amout 0 ETH",async function () {
+         await crowdfundding.connect(creator).createCampaign("test campaing ","test description",ethers.parseEther("10"),30);
+         await expect(crowdfundding.connect(backer1).contribute(0, {value: ethers.parseEther("0")})).to.be.revertedWith("Must send ETH");   
+    
+     });
     
 
 
