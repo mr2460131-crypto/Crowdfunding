@@ -80,8 +80,19 @@ function claimFunds( uint256 campaignID) public onlyCreator(campaignID){
          (bool success,  ) = payable(msg.sender).call{value:amount}("");
       require(success,"transfer failed");
           emit RefundIssued(campaignID, msg.sender, amount);
-
-
       }
+
+function getCampaign(uint256 campaignID) public view returns(
+   address creator,
+   string memory title,
+   string memory description,
+   uint256 goalAmount,
+   uint256 deadline,
+   uint256 amountRaised,
+   bool claimed){
+     Campaigns storage c = campaigns[campaignID];
+    return(c.creator,c.title,c.description,c.goalAmount,c.deadline,c.amountRaised,c.claimed);
+   }
+
 
   }
