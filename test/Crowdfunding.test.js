@@ -25,10 +25,23 @@ describe("CrowdFundding ",function(){
         await crowdfundding.connect(creator).createCampaign("test campaign","test description",ethers.parseEther("10"),30);
         expect(await crowdfundding.campaignCount()).to.equal(1);
     });
+
     it("03. amar campaign start korar try korbo goal amount 0 diya",async function (){
           await expect(crowdfundding.connect(creator).createCampaign("test campaign","test description",0,30)).to.be.revertedWith("Goal must be greater than 0");
        });    
-        
+    it("04. Users can contribute ETH to a campaign", async function() {
+        await crowdfundding.connect(creator).createCampaign("test campaign","test description",ethers.parseEther("10"),30);
+        await crowdfundding.connect(backer1).contribute(0,{value: ethers.parseEther("1")});
+        const campaign = await crowdfundding.getCampaign(0);
+        expect(campaign.amountRaised).to.equal(ethers.parseEther("1"));
+    });
+     
+   it("05 Contribution fails after deadline",async function(){
+       await crowdfundding.connect(creator).createCampaign("test campaign ","test description",ethers.parseEther("10"),30);
+       await time.increase(31 * 24 * 60 * 60);
+      await expect(crowdfundding.connect(backer1).contribute(0, {value: ethers.parseEther("1")})).to.be.revertedWith("Time Over");
+     });
+
     
 
 
