@@ -35,7 +35,7 @@ pragma solidity ^0.8.20;
        uint256 goalAmount,
        uint256 durationInDays )
        public{
-        require(goalAmount >0,"Goal amount be greater than sorry");
+           require(goalAmount >0,"Goal must be greater than 0");
         require(durationInDays >=1 && durationInDays<=60,"Campaign will be finished by 60 days");
               uint256 deadline = block.timestamp + (durationInDays * 1 days);  
                 campaigns[campaignCount].creator = msg.sender;
