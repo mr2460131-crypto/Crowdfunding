@@ -54,9 +54,71 @@ describe("CrowdFundding ",function(){
       const campaign = await crowdfundding.getCampaign(0);
       expect (campaign.claimed).to.equal(true);
       });
-    
-
-
+    it("8. Non-creator cannot claim funds", async function() {
+        await crowdfundding.connect(creator).createCampaign(
+            "test campaign", "test description", ethers.parseEther("10"), 30
+        );
+        await crowdfundding.connect(backer1).contribute(0, {
+            value: ethers.parseEther("10")
+        });
+        await time.increase(31 * 24 * 60 * 60);
+        
+        // backer1 claim করতে পারবে না
+        await expect(
+            crowdfundding.connect(backer1).claimFunds(0)
+        ).to.be.revertedWith("Only campaign creator can call this");
+    });
+    it("9. Claim fails if goal not met", async function() {
+        await crowdfundding.connect(creator).createCampaign(
+            "test campaign", "test description", ethers.parseEther("10"), 30
+        );
+        await crowdfundding.connect(backer1).contribute(0, {
+            value: ethers.parseEther("5")
+        });
+        await time.increase(31 * 24 * 60 * 60);
+        
+        // goal পূরণ হয়নি — claim fail হবে
+        await expect(
+            crowdfundding.connect(creator).claimFunds(0)
+        ).to.be.revertedWith("Goal not achived");
+    });
+    it("10. Backers can get refund if campaign failed", async function() {
+        await crowdfundding.connect(creator).createCampaign(
+            "test campaign", "test description", ethers.parseEther("10"), 30
+        );
+        await crowdfundding.connect(backer1).contribute(0, {
+            value: ethers.parseEther("5")
+        });
+        await time.increase(31 * 24 * 60 * 60);
+        
+        // refund নেওয়ার আগে balance দেখো
+        const balanceBefore = await ethers.provider.getBalance(backer1.address);
+        await crowdfundding.connect(backer1).refund(0);
+        const balanceAfter = await ethers.provider.getBalance(backer1.address);
+        
+        expect(balanceAfter).to.be.gt(balanceBefore);
+    }); 
+    it("11. Refund fails if campaign was successful", async function() {
+        await crowdfundding.connect(creator).createCampaign(
+            "test campaign", "test description", ethers.parseEther("10"), 30
+        );
+        await crowdfundding.connect(backer1).contribute(0, {
+            value: ethers.parseEther("10")
+        });
+        await time.increase(31 * 24 * 60 * 60);
+        
+        // goal পূরণ হয়েছে — refund fail হবে
+        await expect(
+            crowdfundding.connect(backer1).refund(0)
+        ).to.be.revertedWith("you need for till deadline");
+    });
+    it("12. Events are emitted correctly", async function() {
+        await expect(
+            crowdfundding.connect(creator).createCampaign(
+                "test campaign", "test description", ethers.parseEther("10"), 30
+            )
+        ).to.emit(crowdfundding, "CampaignCreated");
+    });
 
 
 
